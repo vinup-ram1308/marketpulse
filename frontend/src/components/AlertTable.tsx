@@ -22,31 +22,33 @@ export function AlertTable({
           time range may have no signals.
         </div>
       ) : (
-        <div className="alert-list">
-          {alerts.map((alert, index) => (
-            <button
-              className="alert-entry"
-              key={`${alert.product_id}-${alert.observed_at}-${alert.signal_type}-${index}`}
-              type="button"
-              onClick={() => onSelectAlert(alert)}
-              aria-label={`Open ${alert.severity} ${alert.signal_type.replaceAll("_", " ")} alert for ${alert.product_name}`}
-            >
-              <span className={`severity-badge ${alert.severity.toLowerCase()}`}>
-                <i />
-                {alert.severity}
-              </span>
-              <span className="alert-entry-signal">
-                {alert.signal_type.replaceAll("_", " ")}
-              </span>
-              <span className="alert-entry-main">
-                <strong>{alert.product_name}</strong>
-                <small>{alert.market} · {alert.product_id}</small>
-              </span>
-              <span className="alert-entry-message">{alert.message}</span>
-              <time dateTime={alert.observed_at}>{formatDateTime(alert.observed_at)}</time>
-              <span className="alert-entry-action" aria-hidden="true">→</span>
-            </button>
-          ))}
+        <div className="alert-list-scroll">
+          <div className="alert-list">
+            {alerts.map((alert, index) => (
+              <button
+                className="alert-entry"
+                key={`${alert.product_id}-${alert.observed_at}-${alert.signal_type}-${index}`}
+                type="button"
+                onClick={() => onSelectAlert(alert)}
+                aria-label={`Open ${alert.severity} ${alert.signal_type.replaceAll("_", " ")} alert for ${alert.product_name}`}
+              >
+                <span className={`severity-badge ${alert.severity.toLowerCase()}`}>
+                  <i />
+                  {alert.severity}
+                </span>
+                <span className="alert-entry-signal">
+                  {alert.signal_type.replaceAll("_", " ")}
+                </span>
+                <span className="alert-entry-main">
+                  <strong>{alert.product_name}</strong>
+                  <small>{alert.market} · {alert.product_id}</small>
+                </span>
+                <span className="alert-entry-message">{alert.message}</span>
+                <time dateTime={alert.observed_at}>{formatDateTime(alert.observed_at)}</time>
+                <span className="alert-entry-action" aria-hidden="true">→</span>
+              </button>
+            ))}
+          </div>
         </div>
       )}
     </Panel>
