@@ -1,0 +1,23 @@
+ARG AIRFLOW_VERSION=3.3.2
+ARG PYTHON_VERSION=3.12
+
+FROM apache/airflow:${AIRFLOW_VERSION}-python${PYTHON_VERSION}
+
+ARG AIRFLOW_VERSION
+ARG PYTHON_VERSION
+
+USER airflow
+
+COPY --chown=airflow:root airflow-requirements.txt /requirements.txt
+COPY --chown=airflow:root dbt-requirements.txt /dbt-requirements.txt
+
+RUN pip install --no-cache-dir \
+    --constraint "https://raw.githubusercontent.com/apache/airflow/constraints-${AIRFLOW_VERSION}/constraints-${PYTHON_VERSION}.txt" \
+    "apache-airflow==${AIRFLOW_VERSION}" \
+    -r /requirements.txt
+
+RUN python -m venv /home/airflow/dbt-venv \
+    && /home/airflow/dbt-venv/bin/python -m pip install --no-cache-dir \
+        -r /dbt-requirements.txt
+
+ENV PATH="${PATH}:/home/airflow/dbt-venv/bin"

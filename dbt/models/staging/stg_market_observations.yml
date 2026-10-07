@@ -1,0 +1,82 @@
+version: 2
+
+models:
+  - name: stg_market_observations
+    description: >-
+      Typed, lightly normalized staging view of raw market observations. Each
+      row remains at the raw observation grain; this model does not aggregate
+      or deduplicate records.
+    columns:
+      - name: observation_id
+        description: Deterministic identifier for a product, competitor, and observation timestamp.
+        data_tests:
+          - not_null
+          - unique
+      - name: batch_id
+        description: Identifier shared by rows generated in the same simulator batch.
+        data_tests:
+          - not_null
+      - name: product_id
+        description: Product catalog identifier.
+        data_tests:
+          - not_null
+      - name: product_name
+        description: Trimmed product display name.
+        data_tests:
+          - not_null
+      - name: category
+        description: Trimmed product category.
+        data_tests:
+          - not_null
+      - name: brand
+        description: Trimmed product brand.
+        data_tests:
+          - not_null
+      - name: competitor_id
+        description: Competitor catalog identifier.
+        data_tests:
+          - not_null
+      - name: competitor_name
+        description: Trimmed competitor display name.
+        data_tests:
+          - not_null
+      - name: market
+        description: Trimmed market code or label.
+        data_tests:
+          - not_null
+      - name: observed_at
+        description: UTC timestamp when the simulator generated the observation.
+        data_tests:
+          - not_null
+      - name: price
+        description: Observed product price in the row currency, retained as NUMERIC.
+        data_tests:
+          - not_null
+      - name: currency
+        description: Trimmed currency code for the observed price.
+        data_tests:
+          - not_null
+      - name: stock_status
+        description: Trimmed inventory status reported for the observation.
+        data_tests:
+          - not_null
+      - name: stock_quantity
+        description: Inventory quantity, retained as INT64.
+        data_tests:
+          - not_null
+      - name: promotion_flag
+        description: Whether a promotion was active, retained as BOOLEAN.
+        data_tests:
+          - not_null
+      - name: promotion_pct
+        description: Promotion percentage, retained as NUMERIC.
+        data_tests:
+          - not_null
+      - name: source
+        description: Trimmed identifier of the system that generated the observation.
+        data_tests:
+          - not_null
+      - name: ingested_at
+        description: UTC timestamp when the raw row was loaded into BigQuery.
+        data_tests:
+          - not_null

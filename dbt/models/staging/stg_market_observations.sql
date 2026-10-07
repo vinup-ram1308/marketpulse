@@ -1,0 +1,20 @@
+select
+    cast(observation_id as string) as observation_id,
+    cast(batch_id as string) as batch_id,
+    cast(product_id as string) as product_id,
+    trim(cast(product_name as string)) as product_name,
+    trim(cast(category as string)) as category,
+    trim(cast(brand as string)) as brand,
+    cast(competitor_id as string) as competitor_id,
+    trim(cast(competitor_name as string)) as competitor_name,
+    trim(cast(market as string)) as market,
+    cast(observed_at as timestamp) as observed_at,
+    cast(price as numeric) as price,
+    trim(cast(currency as string)) as currency,
+    trim(cast(stock_status as string)) as stock_status,
+    cast(stock_quantity as int64) as stock_quantity,
+    cast(promotion_flag as bool) as promotion_flag,
+    cast(promotion_pct as numeric) as promotion_pct,
+    trim(cast(source as string)) as source,
+    cast(ingested_at as timestamp) as ingested_at
+from {{ source('marketpulse_raw', 'raw_market_observations') }}

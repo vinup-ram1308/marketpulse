@@ -1,0 +1,13 @@
+product_id,product_name,category,brand,base_price,currency
+P001,Orion X Pro,Smartphones,Orion,999.00,USD
+P002,Orion X,Smartphones,Orion,749.00,USD
+P003,Nova A5,Smartphones,Nova,429.00,USD
+P004,Pixelight 9,Smartphones,Pixelight,799.00,USD
+P005,Northstar 14,Laptops,Northstar,1299.00,USD
+P006,Northstar Air 13,Laptops,Northstar,999.00,USD
+P007,Vertex Creator 16,Laptops,Vertex,1799.00,USD
+P008,EverydayBook 15,Laptops,Everyday,649.00,USD
+P009,SoundArc Studio,Headphones and Audio,SoundArc,349.00,USD
+P010,SoundArc Go,Headphones and Audio,SoundArc,149.00,USD
+P011,PulsePods Pro,Headphones and Audio,Pulse,229.00,USD
+P012,Wave Mini Speaker,Headphones and Audio,Wave,99.00,USD

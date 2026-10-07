@@ -1,0 +1,103 @@
+# =========================================================
+# MarketPulse - Git Ignore
+# =========================================================
+
+# ---------------------------------------------------------
+# Python
+# ---------------------------------------------------------
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# ---------------------------------------------------------
+# Environment variables / secrets
+# ---------------------------------------------------------
+.env
+.env.*
+!.env.example
+
+*.pem
+*.key
+*.crt
+
+# Google Cloud credentials
+**/application_default_credentials.json
+**/gcp_adc.json
+
+# ---------------------------------------------------------
+# Airflow
+# ---------------------------------------------------------
+airflow/logs/
+airflow/__pycache__/
+airflow/.pytest_cache/
+
+# Local Airflow generated/runtime files
+airflow/standalone_admin_password.txt
+
+# ---------------------------------------------------------
+# dbt
+# ---------------------------------------------------------
+dbt/target/
+dbt/logs/
+dbt/dbt_packages/
+
+# Any generated dbt output
+**/target/
+**/dbt-target/
+**/dbt-logs/
+**/dbt_packages/
+
+# ---------------------------------------------------------
+# Generated MarketPulse data
+# ---------------------------------------------------------
+data/
+**/data/
+**/market_batch_*.csv
+
+# ---------------------------------------------------------
+# Node / React / Vite
+# ---------------------------------------------------------
+node_modules/
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# ---------------------------------------------------------
+# IDE
+# ---------------------------------------------------------
+.vscode/*
+!.vscode/extensions.json
+
+.idea/
+*.iml
+
+# ---------------------------------------------------------
+# OS
+# ---------------------------------------------------------
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# ---------------------------------------------------------
+# Temporary / local files
+# ---------------------------------------------------------
+*.tmp
+*.temp
+*.swp
+*.swo
+# Root runtime logs
+logs/

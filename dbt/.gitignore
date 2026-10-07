@@ -1,0 +1,7 @@
+dbt_packages/
+dbt_internal_packages/
+logs/
+target/
+.env
+airflow/data/dbt-target/
+airflow/data/dbt-logs/

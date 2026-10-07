@@ -1,0 +1,134 @@
+name: marketpulse-airflow
+
+x-airflow-common: &airflow-common
+  image: marketpulse-airflow:3.3.2
+  build:
+    context: .
+    dockerfile: Dockerfile.airflow
+  user: "${AIRFLOW_UID:-50000}:0"
+  environment: &airflow-common-environment
+    AIRFLOW__CORE__EXECUTOR: LocalExecutor
+    AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "true"
+    AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+    AIRFLOW__CORE__EXECUTION_API_SERVER_URL: http://airflow-apiserver:8080/execution/
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
+    AIRFLOW__API__SECRET_KEY: "${AIRFLOW_API_SECRET_KEY:-marketpulse-local-development-only}"
+    AIRFLOW__SCHEDULER__ENABLE_HEALTH_CHECK: "true"
+    AIRFLOW_UID: "${AIRFLOW_UID:-50000}"
+    PYTHONPATH: /opt/airflow/marketpulse
+  volumes: &airflow-common-volumes
+    - ./airflow/dags:/opt/airflow/dags
+    - ./airflow/logs:/opt/airflow/logs
+    - ./airflow/plugins:/opt/airflow/
+    - ./airflow/data:/opt/airflow/marketpulse/data
+    - ./simulator:/opt/airflow/marketpulse/simulator:ro
+    - ./ingestion:/opt/airflow/marketpulse/ingestion:ro
+    - ./config:/opt/airflow/marketpulse/config:ro
+
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: airflow
+    volumes:
+      - postgres-db-volume:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U airflow -d airflow"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    restart: unless-stopped
+
+  airflow-init:
+    <<: *airflow-common
+    command: db migrate
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
+
+  airflow-apiserver:
+    <<: *airflow-common
+    command: api-server
+    environment:
+      <<: *airflow-common-environment
+      AIRFLOW__API_AUTH__JWT_SECRET: "${AIRFLOW_JWT_SECRET:?Set AIRFLOW_JWT_SECRET in .env}"
+    ports:
+      - "127.0.0.1:8080:8080"
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8080/api/v2/monitor/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    depends_on:
+      postgres:
+        condition: service_healthy
+      airflow-init:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
+  airflow-scheduler:
+    <<: *airflow-common
+    command: scheduler
+    environment:
+      <<: *airflow-common-environment
+      AIRFLOW__API_AUTH__JWT_SECRET: "${AIRFLOW_JWT_SECRET:?Set AIRFLOW_JWT_SECRET in .env}"
+      GCP_PROJECT_ID: "${GCP_PROJECT_ID:?Set GCP_PROJECT_ID in .env}"
+      BIGQUERY_DATASET: "${BIGQUERY_DATASET:?Set BIGQUERY_DATASET in .env}"
+      BIGQUERY_TABLE: "${BIGQUERY_TABLE:?Set BIGQUERY_TABLE in .env}"
+      BIGQUERY_LOCATION: "${BIGQUERY_LOCATION:?Set BIGQUERY_LOCATION in .env}"
+      DBT_PROFILES_DIR: /opt/airflow/dbt-config
+      DBT_LOG_PATH: /opt/airflow/marketpulse/data/dbt-logs
+      DBT_TARGET_PATH: /opt/airflow/marketpulse/data/dbt-target
+      MARKETPULSE_GCP_AUTH_MODE: adc
+      GOOGLE_APPLICATION_CREDENTIALS: /run/secrets/gcp_adc.json
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - ./airflow/logs:/opt/airflow/logs
+      - ./airflow/plugins:/opt/airflow/
+      - ./airflow/data:/opt/airflow/marketpulse/data
+      - ./simulator:/opt/airflow/marketpulse/simulator:ro
+      - ./ingestion:/opt/airflow/marketpulse/ingestion:ro
+      - ./config:/opt/airflow/marketpulse/config:ro
+      - ./dbt:/opt/airflow/marketpulse/dbt:ro
+      - "${USERPROFILE}/.dbt/profiles.yml:/opt/airflow/dbt-config/profiles.yml:ro"
+      - "${APPDATA}/gcloud/application_default_credentials.json:/run/secrets/gcp_adc.json:ro"
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8974/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    depends_on:
+      postgres:
+        condition: service_healthy
+      airflow-init:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
+  airflow-dag-processor:
+    <<: *airflow-common
+    command: dag-processor
+    depends_on:
+      postgres:
+        condition: service_healthy
+      airflow-init:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
+  airflow-triggerer:
+    <<: *airflow-common
+    command: triggerer
+    depends_on:
+      postgres:
+        condition: service_healthy
+      airflow-init:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
+volumes:
+  postgres-db-volume:

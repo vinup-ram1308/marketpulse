@@ -1,0 +1,198 @@
+version: 2
+
+models:
+  - name: int_market_signal_features
+    description: >-
+      Temporal features for each product, market, currency, and observed_at
+      snapshot. Comparisons are only between snapshots of the same product,
+      market, and currency. Previous-snapshot metrics, changes, and directions
+      are NULL for the first available snapshot in each series. This model
+      engineers features only and does not classify business alerts.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - product_id
+              - market
+              - currency
+              - observed_at
+    columns:
+      - name: product_id
+        description: Product catalog identifier.
+        data_tests:
+          - not_null
+      - name: product_name
+        description: Product display name for the snapshot.
+        data_tests:
+          - not_null
+      - name: category
+        description: Product category for the snapshot.
+        data_tests:
+          - not_null
+      - name: brand
+        description: Product brand for the snapshot.
+        data_tests:
+          - not_null
+      - name: market
+        description: Competitor market used to scope the snapshot.
+        data_tests:
+          - not_null
+      - name: currency
+        description: Currency used to scope the competitor price comparisons.
+        data_tests:
+          - not_null
+      - name: observed_at
+        description: Timestamp defining this market snapshot; retained as TIMESTAMP.
+        data_tests:
+          - not_null
+      - name: batch_id
+        description: Batch associated with this market snapshot.
+        data_tests:
+          - not_null
+      - name: competitor_count
+        description: Number of distinct competitors represented in the snapshot.
+        data_tests:
+          - not_null
+      - name: avg_competitor_price
+        description: Average representative competitor price, in currency units.
+        data_tests:
+          - not_null
+      - name: min_competitor_price
+        description: Lowest representative competitor price, in currency units.
+        data_tests:
+          - not_null
+      - name: max_competitor_price
+        description: Highest representative competitor price, in currency units.
+        data_tests:
+          - not_null
+      - name: price_spread
+        description: Maximum less minimum representative competitor price.
+        data_tests:
+          - not_null
+      - name: price_spread_pct
+        description: Price spread divided by average competitor price, times 100.
+        data_tests:
+          - not_null
+      - name: lowest_price_competitor_id
+        description: Competitor ID associated with the lowest price.
+        data_tests:
+          - not_null
+      - name: lowest_price_competitor_name
+        description: Competitor name associated with the lowest price.
+        data_tests:
+          - not_null
+      - name: lowest_price
+        description: Lowest representative competitor price, in currency units.
+        data_tests:
+          - not_null
+      - name: highest_price_competitor_id
+        description: Competitor ID associated with the highest price.
+        data_tests:
+          - not_null
+      - name: highest_price_competitor_name
+        description: Competitor name associated with the highest price.
+        data_tests:
+          - not_null
+      - name: highest_price
+        description: Highest representative competitor price, in currency units.
+        data_tests:
+          - not_null
+      - name: in_stock_competitor_count
+        description: Number of competitors in stock for the snapshot.
+        data_tests:
+          - not_null
+      - name: in_stock_pct
+        description: In-stock competitor share, expressed as a percentage.
+        data_tests:
+          - not_null
+      - name: promotion_competitor_count
+        description: Number of competitors with an active promotion.
+        data_tests:
+          - not_null
+      - name: promotion_competitor_pct
+        description: Competitors with promotions as a percentage of competitors.
+        data_tests:
+          - not_null
+      - name: market_price_pressure
+        description: Price spread divided by average competitor price; a ratio.
+        data_tests:
+          - not_null
+      - name: promotion_activity_flag
+        description: True when at least one competitor has an active promotion.
+        data_tests:
+          - not_null
+      - name: previous_avg_competitor_price
+        description: >-
+          Previous snapshot average competitor price; NULL for the first
+          available snapshot in the series.
+      - name: previous_min_competitor_price
+        description: >-
+          Previous snapshot minimum competitor price; NULL for the first
+          available snapshot in the series.
+      - name: previous_max_competitor_price
+        description: >-
+          Previous snapshot maximum competitor price; NULL for the first
+          available snapshot in the series.
+      - name: previous_price_spread
+        description: >-
+          Previous snapshot price spread; NULL for the first available
+          snapshot in the series.
+      - name: previous_price_spread_pct
+        description: >-
+          Previous snapshot price spread percentage; NULL for the first
+          available snapshot in the series.
+      - name: previous_in_stock_pct
+        description: >-
+          Previous snapshot in-stock percentage; NULL for the first available
+          snapshot in the series.
+      - name: previous_promotion_competitor_pct
+        description: >-
+          Previous snapshot promotion competitor percentage; NULL for the
+          first available snapshot in the series.
+      - name: previous_market_price_pressure
+        description: >-
+          Previous snapshot market price pressure; NULL for the first available
+          snapshot in the series.
+      - name: avg_competitor_price_change
+        description: Current average competitor price less its previous value.
+      - name: avg_competitor_price_change_pct
+        description: >-
+          Average competitor price change divided by its previous value, times
+          100, using SAFE_DIVIDE.
+      - name: price_spread_change
+        description: Current price spread less its previous value.
+      - name: price_spread_change_pct
+        description: >-
+          Price spread change divided by its previous value, times 100, using
+          SAFE_DIVIDE.
+      - name: in_stock_pct_change
+        description: Current in-stock percentage less its previous value.
+      - name: in_stock_pct_change_pct
+        description: >-
+          In-stock percentage change divided by its previous value, times 100,
+          using SAFE_DIVIDE.
+      - name: promotion_competitor_pct_change
+        description: >-
+          Current promotion competitor percentage less its previous value.
+      - name: promotion_competitor_pct_change_pct
+        description: >-
+          Promotion competitor percentage change divided by its previous value,
+          times 100, using SAFE_DIVIDE.
+      - name: market_price_pressure_change
+        description: Current market price pressure less its previous value.
+      - name: market_price_pressure_change_pct
+        description: >-
+          Market price pressure change divided by its previous value, times 100,
+          using SAFE_DIVIDE.
+      - name: price_direction
+        description: >-
+          Direction of average competitor price versus the previous snapshot;
+          NULL for the first available snapshot. Uses exact comparisons.
+      - name: promotion_direction
+        description: >-
+          Direction of promotion competitor percentage versus the previous
+          snapshot; NULL for the first available snapshot. Uses exact comparisons.
+      - name: inventory_direction
+        description: >-
+          Direction of in-stock percentage versus the previous snapshot; NULL
+          for the first available snapshot. Uses exact comparisons.

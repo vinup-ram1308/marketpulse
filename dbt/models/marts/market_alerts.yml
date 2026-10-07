@@ -1,0 +1,142 @@
+version: 2
+
+models:
+  - name: market_alerts
+    description: >-
+      Explainable temporal competitive-intelligence signals derived from
+      product, market, currency, and timestamp market features. The model
+      contains competitor market metrics only and never represents an internal
+      or owned price. First snapshots have NULL previous values and therefore
+      produce no temporal-change signals. A row is emitted only when one of
+      the documented signal rules is met.
+
+      PRICE_MOVEMENT emits when the absolute average competitor price
+      percentage change is at least 2.5%. LOW is 2.5% to under 3.75%, MEDIUM
+      is 3.75% to under 5%, and HIGH is at least 5%. The simulator independently
+      samples each competitor's price within +/-3% of its competitor-adjusted
+      base price per snapshot. In a deterministic 168-hour, 12-product sample,
+      the 95th percentile of absolute hourly average-price percentage changes
+      was 2.376%; the proposed 1% candidate occurred in 821 of 2,004 transitions
+      (about 41%). The 2.5% trigger is just above the observed 95th percentile
+      and suppresses common simulator variation.
+
+      PROMOTION_SURGE emits when promotion competitor share rises by at least
+      25 percentage points. Four competitors make each one-competitor change
+      exactly 25 points. LOW is 25 to under 50 points, MEDIUM is 50 to under
+      75 points, and HIGH is at least 75 points.
+
+      INVENTORY_PRESSURE emits when in-stock competitor share falls by at least
+      25 percentage points. With four competitors this represents at least one
+      competitor moving out of the in-stock state. LOW is a 25 to under 50
+      point decrease, MEDIUM is 50 to under 75 points, and HIGH is at least
+      75 points.
+
+      PRICE_DISPERSION emits when price_spread_pct rises by at least 6
+      percentage points. A deterministic 168-hour, 12-product simulator sample
+      had a 95th percentile positive hourly spread-percentage change of 5.685
+      points, so 6 points filters changes at or below the observed 95th
+      percentile. LOW is 6 to under 9 points, MEDIUM is 9 to under 12 points,
+      and HIGH is at least 12 points. This measures increased competitor
+      dispersion, not movement relative to an internal price.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - product_id
+              - market
+              - currency
+              - observed_at
+              - signal_type
+    columns:
+      - name: product_id
+        description: Product catalog identifier.
+        data_tests:
+          - not_null
+      - name: product_name
+        description: Product display name for the snapshot.
+        data_tests:
+          - not_null
+      - name: category
+        description: Product category for the snapshot.
+        data_tests:
+          - not_null
+      - name: brand
+        description: Product brand for the snapshot.
+        data_tests:
+          - not_null
+      - name: market
+        description: Competitor market used to scope the snapshot.
+        data_tests:
+          - not_null
+      - name: currency
+        description: Currency used to scope price comparisons.
+        data_tests:
+          - not_null
+      - name: observed_at
+        description: Timestamp of the market snapshot; retained at exact snapshot grain.
+        data_tests:
+          - not_null
+      - name: batch_id
+        description: Batch associated with the market snapshot.
+        data_tests:
+          - not_null
+      - name: signal_type
+        description: >-
+          Rule that fired. PRICE_MOVEMENT requires absolute average competitor
+          price percentage change >= 2.5%. PROMOTION_SURGE requires a promotion
+          competitor share increase >= 25 percentage points. INVENTORY_PRESSURE
+          requires an in-stock share decrease >= 25 percentage points.
+          PRICE_DISPERSION requires a price_spread_pct increase >= 6 percentage
+          points. Threshold rationales and severity bands are documented in
+          the model description.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - PRICE_MOVEMENT
+                  - PROMOTION_SURGE
+                  - INVENTORY_PRESSURE
+                  - PRICE_DISPERSION
+      - name: severity
+        description: >-
+          LOW, MEDIUM, or HIGH. For continuous rules, LOW spans 1x to under
+          1.5x the trigger, MEDIUM spans 1.5x to under 2x, and HIGH is at least
+          2x. This yields PRICE_MOVEMENT bands [2.5%, 3.75%), [3.75%, 5%), and
+          >=5%; PRICE_DISPERSION bands [6, 9), [9, 12), and >=12 percentage
+          points. For discrete competitor-share rules, the bands correspond
+          respectively to one, two, and at least three competitors: 25 to under
+          50, 50 to under 75, and at least 75 percentage points.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - LOW
+                  - MEDIUM
+                  - HIGH
+      - name: signal_value
+        description: >-
+          Current metric used by this signal: average competitor price for
+          PRICE_MOVEMENT; competitor promotion share for PROMOTION_SURGE;
+          in-stock competitor share for INVENTORY_PRESSURE; and price spread
+          as a percentage of average price for PRICE_DISPERSION.
+      - name: previous_value
+        description: >-
+          The corresponding metric from the previous snapshot for the same
+          product, market, and currency. This is non-NULL for emitted temporal
+          signals.
+      - name: absolute_change
+        description: >-
+          Current metric less its previous value. For percentage metrics this
+          is expressed in percentage points; for PRICE_MOVEMENT it is in
+          currency units.
+      - name: percentage_change
+        description: >-
+          Relative percentage change supplied by the feature model. It may be
+          NULL when the previous metric is zero or when the source feature does
+          not define a relative change for the selected metric.
+      - name: message
+        description: Deterministic human-readable explanation including the relevant values.
+        data_tests:
+          - not_null

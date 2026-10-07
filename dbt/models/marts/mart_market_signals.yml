@@ -1,0 +1,126 @@
+version: 2
+
+models:
+  - name: mart_market_signals
+    description: >-
+      Analysis-ready competitive market snapshots at product, market, currency,
+      and observation timestamp grain. The mart contains competitor conditions
+      only; it does not represent an internal or owned product price.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - product_id
+              - market
+              - currency
+              - observed_at
+    columns:
+      - name: product_id
+        description: Product catalog identifier.
+        data_tests:
+          - not_null
+      - name: product_name
+        description: Product display name selected deterministically from the snapshot rows.
+        data_tests:
+          - not_null
+      - name: category
+        description: Product category selected deterministically from the snapshot rows.
+        data_tests:
+          - not_null
+      - name: brand
+        description: Product brand selected deterministically from the snapshot rows.
+        data_tests:
+          - not_null
+      - name: market
+        description: Competitor market used to scope the snapshot.
+        data_tests:
+          - not_null
+      - name: currency
+        description: Currency used to scope the competitor price comparisons.
+        data_tests:
+          - not_null
+      - name: observed_at
+        description: UTC timestamp defining the market snapshot.
+        data_tests:
+          - not_null
+      - name: batch_id
+        description: >-
+          Batch ID associated with this snapshot. The current workflow intends
+          one simulator batch per observed_at timestamp. If multiple batch IDs
+          share a timestamp, the model retains the lexicographically first ID.
+        data_tests:
+          - not_null
+      - name: competitor_count
+        description: Number of distinct competitors represented in the snapshot.
+        data_tests:
+          - not_null
+      - name: avg_competitor_price
+        description: Arithmetic mean of the representative observed price for each competitor, in currency units.
+        data_tests:
+          - not_null
+      - name: min_competitor_price
+        description: Lowest representative observed competitor price, in currency units.
+        data_tests:
+          - not_null
+      - name: max_competitor_price
+        description: Highest representative observed competitor price, in currency units.
+        data_tests:
+          - not_null
+      - name: price_spread
+        description: Maximum minus minimum representative competitor price, in currency units.
+        data_tests:
+          - not_null
+      - name: price_spread_pct
+        description: Price spread divided by average competitor price, multiplied by 100.
+        data_tests:
+          - not_null
+      - name: lowest_price_competitor_id
+        description: Competitor ID at the lowest price, ordered by price ascending and competitor ID ascending.
+        data_tests:
+          - not_null
+      - name: lowest_price_competitor_name
+        description: Competitor name associated with the deterministically selected lowest price.
+        data_tests:
+          - not_null
+      - name: lowest_price
+        description: Lowest representative observed competitor price, in currency units.
+        data_tests:
+          - not_null
+      - name: highest_price_competitor_id
+        description: Competitor ID at the highest price, ordered by price descending and competitor ID ascending.
+        data_tests:
+          - not_null
+      - name: highest_price_competitor_name
+        description: Competitor name associated with the deterministically selected highest price.
+        data_tests:
+          - not_null
+      - name: highest_price
+        description: Highest representative observed competitor price, in currency units.
+        data_tests:
+          - not_null
+      - name: in_stock_competitor_count
+        description: Number of competitors whose representative observation has stock_quantity greater than zero.
+        data_tests:
+          - not_null
+      - name: in_stock_pct
+        description: In-stock competitor count divided by competitor count, multiplied by 100.
+        data_tests:
+          - not_null
+      - name: promotion_competitor_count
+        description: Number of competitors whose representative observation has an active promotion.
+        data_tests:
+          - not_null
+      - name: promotion_competitor_pct
+        description: Promotion competitor count divided by competitor count, multiplied by 100; this is the share of competitors promoting, not the raw discount percentage.
+        data_tests:
+          - not_null
+      - name: market_price_pressure
+        description: >-
+          Continuous relative price dispersion, calculated as price_spread divided
+          by avg_competitor_price. It is a ratio, not a threshold-based label.
+        data_tests:
+          - not_null
+      - name: promotion_activity_flag
+        description: True when at least one competitor has an active promotion.
+        data_tests:
+          - not_null

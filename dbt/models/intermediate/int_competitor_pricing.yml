@@ -1,0 +1,102 @@
+version: 2
+
+models:
+  - name: int_competitor_pricing
+    description: >-
+      Adds within-market competitor pricing metrics to each staged observation.
+      The output retains the input observation rows and does not deduplicate or
+      aggregate away competitor observations.
+    columns:
+      - name: observation_id
+        description: Deterministic identifier for a product, competitor, and observation timestamp.
+        data_tests:
+          - not_null
+          - unique
+      - name: batch_id
+        description: Identifier shared by observations generated in the same simulator batch.
+        data_tests:
+          - not_null
+      - name: product_id
+        description: Product catalog identifier.
+        data_tests:
+          - not_null
+      - name: product_name
+        description: Trimmed product display name.
+      - name: category
+        description: Trimmed product category.
+      - name: brand
+        description: Trimmed product brand.
+      - name: competitor_id
+        description: Competitor catalog identifier.
+        data_tests:
+          - not_null
+      - name: competitor_name
+        description: Trimmed competitor display name.
+      - name: market
+        description: Trimmed market code or label used to scope price comparisons.
+        data_tests:
+          - not_null
+      - name: observed_at
+        description: UTC timestamp when the market observation was generated.
+        data_tests:
+          - not_null
+      - name: price
+        description: Observed competitor price in the row currency, retained as NUMERIC.
+      - name: currency
+        description: Trimmed currency code; comparisons are partitioned by currency.
+        data_tests:
+          - not_null
+      - name: stock_status
+        description: Inventory status reported for the observation.
+      - name: stock_quantity
+        description: Inventory quantity reported for the observation, retained as INT64.
+      - name: promotion_flag
+        description: Whether a promotion was active for the observation.
+      - name: promotion_pct
+        description: Promotion percentage from the raw observation, not applied to price.
+      - name: source
+        description: Identifier of the system that generated the observation.
+      - name: ingested_at
+        description: UTC timestamp when the observation was loaded into the RAW table.
+        data_tests:
+          - not_null
+      - name: competitor_count
+        description: Number of distinct competitors for the product, market, currency, and observed_at.
+        data_tests:
+          - not_null
+      - name: avg_competitor_price
+        description: Average representative competitor price for the product/market/currency/timestamp partition.
+        data_tests:
+          - not_null
+      - name: min_competitor_price
+        description: Lowest representative competitor price for the product/market/currency/timestamp partition.
+        data_tests:
+          - not_null
+      - name: max_competitor_price
+        description: Highest representative competitor price for the product/market/currency/timestamp partition.
+        data_tests:
+          - not_null
+      - name: price_spread
+        description: Maximum representative competitor price minus the minimum for the comparison partition.
+        data_tests:
+          - not_null
+      - name: price_rank
+        description: Dense ascending rank of this competitor's representative price; 1 is the lowest price.
+        data_tests:
+          - not_null
+      - name: pct_diff_from_avg_price
+        description: >-
+          (observation price minus average competitor price) divided by average
+          competitor price, expressed as a percentage. NULL when the average is zero.
+      - name: pct_diff_from_lowest_price
+        description: >-
+          (observation price minus minimum competitor price) divided by minimum
+          competitor price, expressed as a percentage. NULL when the minimum is zero.
+      - name: in_stock_indicator
+        description: True when stock_quantity is greater than zero, including LOW_STOCK observations.
+        data_tests:
+          - not_null
+      - name: promotion_indicator
+        description: Boolean copy of promotion_flag indicating an active promotion.
+        data_tests:
+          - not_null

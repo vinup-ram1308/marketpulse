@@ -1,0 +1,5 @@
+fastapi
+google-cloud-bigquery
+httpx
+python-dotenv
+uvicorn[standard]
