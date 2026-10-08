@@ -2,7 +2,7 @@
 
 ## Executive Summary
 
-MarketPulse is a complete, production-quality automated competitive intelligence pipeline. All components are implemented, tested, documented, and validated. The project demonstrates full-stack proficiency: data engineering (simulator → BigQuery), orchestration (Airflow), analytics (dbt), backend API (FastAPI), and frontend (React/TypeScript). Ready for recruiter portfolio review.
+MarketPulse is a complete, portfolio-grade automated competitive intelligence pipeline, validated as a development/demo project. All components are implemented, tested, documented, and validated. The project demonstrates full-stack proficiency: data engineering (simulator → BigQuery), orchestration (Airflow), analytics (dbt), backend API (FastAPI), and frontend (React/TypeScript). Ready for recruiter portfolio review.
 
 ---
 
@@ -140,7 +140,7 @@ npm run build                                                  # Production buil
 ```
 
 ### Environment Configuration
-- Backend defaults: `GCP_PROJECT_ID=marketpulse-510219`, `BIGQUERY_ANALYTICS_DATASET=marketpulse_analytics`, `BIGQUERY_LOCATION=asia-south1`
+- Backend defaults: `GCP_PROJECT_ID=<your-project-id>`, `BIGQUERY_ANALYTICS_DATASET=marketpulse_analytics`, `BIGQUERY_LOCATION=asia-south1`
 - Frontend API: `VITE_API_BASE_URL=http://127.0.0.1:8000`
 - Ingestion requires explicit `GCP_PROJECT_ID`, `BIGQUERY_DATASET`, `BIGQUERY_TABLE`, `BIGQUERY_LOCATION` (no defaults)
 
@@ -227,13 +227,13 @@ npm run build                                                  # Production buil
 
 3. **Orchestration:** Configured Airflow DAG with staged execution, load validation, and scoped dbt builds.
 
-4. **Backend API:** Built a production-ready FastAPI service with parameterized BigQuery queries, Pydantic validation, CORS security, and comprehensive error handling.
+4. **Backend API:** Built a portfolio-grade FastAPI service with parameterized BigQuery queries, Pydantic validation, CORS security, and comprehensive error handling.
 
 5. **Frontend:** Created a responsive, accessible React dashboard that consumes real BigQuery data, handles errors gracefully, and provides interactive drill-down analysis.
 
 6. **Full-Stack Design:** Connected all layers (simulator → pipeline → warehouse → API → dashboard) with clear boundaries and well-documented contracts.
 
-7. **Quality & Testing:** Comprehensive test coverage (66 tests), zero vulnerabilities, production-grade documentation, and honest acknowledgment of limitations.
+7. **Quality & Testing:** Comprehensive test coverage (66 tests), zero vulnerabilities, portfolio-grade documentation, and honest acknowledgment of limitations.
 
 8. **Problem Solving:** Designed deterministic time-varying simulation, implemented temporal feature engineering with LAG(), and created explainable threshold-based alerts without inventing an internal price.
 
@@ -246,7 +246,7 @@ npm run build                                                  # Production buil
 - **Recommended Use:** Clone repository, run local setup commands, explore the dashboard against live BigQuery data (with credentials)
 - **Estimated Review Time:** 5–10 minutes to understand the problem and architecture; 10–15 minutes to run the local stack
 
-**No outstanding defects or incomplete features.**
+**No known blocking defects remain for the current portfolio/demo scope.**
 
 ---
 
