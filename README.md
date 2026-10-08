@@ -10,7 +10,7 @@
 
 **An end-to-end data and analytics engineering project with a decision-support interface.** MarketPulse turns recurring competitor observations (pricing, stock availability, promotions) into explainable, rule-based alerts that an analyst can investigate.
 
-![MarketPulse overview dashboard](docs/screenshots/overview.png)
+![MarketPulse overview dashboard](docs/dashboard-overview.png)
 
 > **About the data.** MarketPulse runs on a **deterministic synthetic market simulator**. It does not scrape retailers, consume an external market feed, or monitor real-world markets. Labels such as "LIVE FEED" and "LIVE MARKET INTELLIGENCE" in the dashboard refer to this simulated observation stream. Signal detection is rule-based SQL, not machine learning.
 
@@ -167,39 +167,39 @@ The screenshots show **captured dashboard states using a selected time window**.
 
 #### Overview
 
-![Overview](docs/screenshots/overview.png)
+![Overview](docs/dashboard-overview.png)
 
 *A captured state with 2 active filters (from 06-10-2026 00:04 to 07-10-2026 16:04) and 100 snapshots in view. The market-health card reads "At risk" with 5 high-severity alerts; KPI cards show total alerts (294 in this capture), products monitored, average competitor price, in-stock share and promotion share. Selectors for product, market, signal and severity sit above, with a Clear all control.*
 
 #### Signals
 
-![Competitive price trend](docs/screenshots/signals-price-trend.png)
+![Competitive price trend](docs/price-trend.png)
 
 *Signals grouped into four families (Promotion, Inventory, Price, Dispersion) with active and recorded counts, plus a competitive price trend (USD average) beside a current-position summary.*
 
-![Inventory vs promotion](docs/screenshots/signals-inventory-promotion.png)
+![Inventory vs promotion](docs/signals-inventory-promotion.png)
 
 *Mean in-stock share and mean promotion share per snapshot, plotted together.*
 
-![Signal stream and product watchlist](docs/screenshots/signals-stream-watchlist.png)
+![Signal stream and product watchlist](docs/signals-stream-watchlist.png)
 
 *Recent changes with severity badges next to a product watchlist showing price, in-stock share and latest signal.*
 
 #### Investigation
 
-![Signal investigation drawer](docs/screenshots/signal-drawer.png)
+![Signal investigation drawer](docs/signal-drawer.png)
 
 *Selecting a signal opens a drawer with severity, product, market and currency, a "What changed" explanation, and the latest matching snapshot (average, lowest and highest competitor price, in-stock and promotion share). The drawer notes that snapshot values are not necessarily from the alert's timestamp.*
 
 #### Alerts
 
-![Alerts queue](docs/screenshots/alerts.png)
+![Alerts queue](docs/alerts.png)
 
 *A scrollable investigation queue with severity, signal type, product, explanation and timestamp for each alert. This capture showed 100 alerts in the current result.*
 
 #### Products
 
-![Products table](docs/screenshots/products.png)
+![Products table](docs/products.png)
 
 *Latest snapshot per product and market: category, brand, average price, spread, in-stock %, promotion % and last update time.*
 
